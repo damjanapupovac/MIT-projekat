@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:table_calendar/table_calendar.dart';
 import 'app_colours.dart';
 
 class Styles {
@@ -81,4 +82,18 @@ class Styles {
       ),
     );
   }
+  static CalendarStyle calendarStyle(BuildContext context) {
+  return CalendarStyle(
+    selectedDecoration: BoxDecoration(
+      color: Theme.of(context).colorScheme.primary,
+      shape: BoxShape.circle,
+    ),
+    todayDecoration: BoxDecoration(
+      color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
+      shape: BoxShape.circle,
+    ),
+    defaultTextStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+    weekendTextStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+  );
+}
 }
