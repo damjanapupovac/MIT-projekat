@@ -1,10 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:kpop_profiles/consts/themes.dart';
+import 'package:kpop_profiles/providers/theme_providers.dart';
 import 'package:kpop_profiles/screens/favourites.dart';
 import 'package:kpop_profiles/screens/login.dart';
 import 'package:kpop_profiles/screens/root_screen.dart';
+import 'package:provider/provider.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => ThemeProvider(),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -12,20 +20,20 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'K-Pop Profiles',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
-      home: const RootScreen(),
-      routes: {
-        RootScreen.routeName:(context)=>const RootScreen(),
-        Favourites.routeName:(context)=>const Favourites(),
-        //RegisterScreen.routName:(context)=>const RegisterScreen(),
-        LoginScreen.routeName:(context)=>const LoginScreen(),
-      }
+    return Consumer<ThemeProvider>(
+      builder: (context, themeProvider, child) {
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: 'K-Pop Profiles',
+          theme: Styles.themeData(isDarkTheme: themeProvider.getIsDarkTheme),
+          home: const RootScreen(),
+          routes: {
+            RootScreen.routeName: (context) => const RootScreen(),
+            Favourites.routeName: (context) => const Favourites(),
+            LoginScreen.routeName: (context) => const LoginScreen(),
+          },
+        );
+      },
     );
   }
 }

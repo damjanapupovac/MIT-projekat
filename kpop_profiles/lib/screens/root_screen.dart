@@ -50,7 +50,7 @@ late PageController controller;
           NavigationDestination(icon: Icon(IconlyBold.search), label: "Search"),
           NavigationDestination(icon: Icon(IconlyBold.calendar), label: "Calendar"),
           NavigationDestination(icon: Icon(IconlyBold.heart), label: "Favourites"),
-          NavigationDestination(icon: Icon(IconlyBold.profile), label: "Prosile")
+          NavigationDestination(icon: Icon(IconlyBold.profile), label: "Profile")
         ],
       ),
     );
