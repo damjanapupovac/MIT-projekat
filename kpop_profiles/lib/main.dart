@@ -3,6 +3,8 @@ import 'package:kpop_profiles/consts/themes.dart';
 import 'package:kpop_profiles/providers/theme_providers.dart';
 import 'package:kpop_profiles/screens/favourites.dart';
 import 'package:kpop_profiles/screens/login.dart';
+import 'package:kpop_profiles/screens/profile_screen.dart';
+import 'package:kpop_profiles/screens/register.dart';
 import 'package:kpop_profiles/screens/root_screen.dart';
 import 'package:provider/provider.dart';
 
@@ -31,6 +33,8 @@ class MyApp extends StatelessWidget {
             RootScreen.routeName: (context) => const RootScreen(),
             Favourites.routeName: (context) => const Favourites(),
             LoginScreen.routeName: (context) => const LoginScreen(),
+            RegisterScreen.routeName: (context) => const RegisterScreen(),
+            ProfileScreen.routeName: (context) => const ProfileScreen(),
           },
         );
       },
