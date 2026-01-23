@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kpop_profiles/consts/themes.dart';
 import 'package:kpop_profiles/providers/auth_providers.dart';
+import 'package:kpop_profiles/providers/idol_provider.dart';
 import 'package:kpop_profiles/providers/theme_providers.dart';
 import 'package:kpop_profiles/screens/add_group.dart';
 import 'package:kpop_profiles/screens/edit_profile.dart';
@@ -21,6 +22,7 @@ void main() {
         ChangeNotifierProvider(
           create: (_) => ThemeProvider(),
         ),
+        ChangeNotifierProvider(create: (_) => IdolProvider()),
       ],
       child: const MyApp(),
     ),

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:kpop_profiles/providers/idol_provider.dart';
 import 'package:kpop_profiles/screens/add_group.dart';
 import 'package:kpop_profiles/screens/group_details.dart';
 import '../models/group_model.dart';
@@ -13,18 +15,22 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen> {
-  static List<GroupModel> allGroups = [
-    GroupModel(
-      id: '1',
-      name: 'TWICE',
-      imageUrl: '',
-      idols: [],
-      comments: [],
-    ),
-  ];
-
   @override
   Widget build(BuildContext context) {
+    final idolProvider = Provider.of<IdolProvider>(context);
+
+    final List<GroupModel> allGroups = [
+      GroupModel(
+        id: '1',
+        name: 'TWICE',
+        imageUrl: '',
+        idols: [
+          idolProvider.idols.firstWhere((i) => i.id == '101'),
+        ],
+        comments: [],
+      ),
+    ];
+
     return Scaffold(
       appBar: AppBar(title: const Text("Search Groups")),
       body: ListView.builder(
@@ -39,7 +45,7 @@ class _SearchScreenState extends State<SearchScreen> {
               margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               height: 140,
               decoration: BoxDecoration(
-                border: Border.all(width: 2.5),
+                border: Border.all(width: 2.5, color: Theme.of(context).primaryColor),
                 borderRadius: BorderRadius.circular(25),
               ),
               child: Padding(

@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:kpop_profiles/providers/idol_provider.dart';
 import 'package:kpop_profiles/screens/idol_profile.dart';
 import '../models/group_model.dart';
 import '../models/comment_model.dart';
 import '../models/enums.dart';
+import '../models/idol_model.dart';
 
 class GroupDetailsScreen extends StatefulWidget {
   final GroupModel group;
@@ -18,6 +21,8 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final idolProvider = Provider.of<IdolProvider>(context);
+
     return Scaffold(
       appBar: AppBar(title: Text(widget.group.name)),
       body: Column(
@@ -31,7 +36,15 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
             child: ListView.builder(
               itemCount: widget.group.idols.length,
               itemBuilder: (context, index) {
-                final idol = widget.group.idols[index];
+                final groupIdol = widget.group.idols[index];
+                
+                IdolModel idol;
+                try {
+                  idol = idolProvider.idols.firstWhere((element) => element.id == groupIdol.id);
+                } catch (e) {
+                  idol = groupIdol;
+                }
+
                 return GestureDetector(
                   onTap: () => Navigator.push(context, MaterialPageRoute(
                     builder: (c) => IdolProfileScreen(idol: idol, role: widget.role),
@@ -40,7 +53,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
                     margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      border: Border.all(width: 2),
+                      border: Border.all(width: 2, color: Theme.of(context).primaryColor),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Row(
@@ -62,7 +75,9 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
                               color: idol.isFavorite ? Colors.red : null,
                               size: 30,
                             ),
-                            onPressed: () => setState(() => idol.isFavorite = !idol.isFavorite),
+                            onPressed: () {
+                              idolProvider.toggleFavorite(idol.id);
+                            },
                           ),
                       ],
                     ),
@@ -91,19 +106,25 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
         return Container(
           margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
           padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(color: Colors.grey[200], borderRadius: BorderRadius.circular(15)),
+          decoration: BoxDecoration(
+            color: Theme.of(context).cardColor, 
+            borderRadius: BorderRadius.circular(15),
+            border: Border.all(color: Colors.grey.shade300)
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(comment.username, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.purple)),
+              Text(comment.username, style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).primaryColor)),
               Text(comment.text),
               Align(
                 alignment: Alignment.bottomRight,
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    IconButton(icon: const Icon(Icons.favorite, size: 16, color: Colors.red), 
-                    onPressed: () => setState(() => comment.likes++)),
+                    IconButton(
+                      icon: const Icon(Icons.favorite, size: 16, color: Colors.red), 
+                      onPressed: () => setState(() => comment.likes++)
+                    ),
                     Text("${comment.likes}"),
                   ],
                 ),
@@ -114,12 +135,18 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
       },
     );
   }
+
   Widget _buildCommentInput(List<CommentModel> comments) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Row(
         children: [
-          Expanded(child: TextField(controller: _commentController, decoration: const InputDecoration(hintText: "Add comment..."))),
+          Expanded(
+            child: TextField(
+              controller: _commentController, 
+              decoration: const InputDecoration(hintText: "Add comment...")
+            )
+          ),
           IconButton(
             icon: const Icon(Icons.send),
             onPressed: () {
