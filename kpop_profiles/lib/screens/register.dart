@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:kpop_profiles/consts/validator.dart';
-import 'package:kpop_profiles/screens/login.dart';
 import 'package:kpop_profiles/services/app_functions.dart';
 import 'package:kpop_profiles/services/assets_manager.dart';
 import 'package:kpop_profiles/widgets/image_picker.dart';

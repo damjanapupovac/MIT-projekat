@@ -17,23 +17,30 @@ class _CalendarState extends State<Calendar> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('Calendar')),
-      body: TableCalendar(
-        calendarFormat: CalendarFormat.month,
-        headerStyle: const HeaderStyle(
-          formatButtonVisible: false,
-          titleCentered: true,
+      body: Column(
+        children: [
+          TableCalendar(
+            calendarFormat: CalendarFormat.month,
+            headerStyle: const HeaderStyle(
+              formatButtonVisible: false,
+              titleCentered: true,
+            ),
+            calendarStyle: Styles.calendarStyle(context),
+            firstDay: DateTime.utc(2026, 1, 1),
+            lastDay: DateTime.utc(2050, 12, 31),
+            focusedDay: _focusedDay,
+            selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
+            onDaySelected: _onDaySelected,
+          ),Divider(
+          thickness: 1,
+          color: Theme.of(context).dividerColor,
         ),
-        calendarStyle: Styles.calendarStyle(context),
-        firstDay: DateTime.utc(2026, 1, 1),
-        lastDay: DateTime.utc(2050, 12, 31),
-        focusedDay: _focusedDay,
-        selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
-        onDaySelected: _onDaySelected,
+        ],
       ),
     );
   }
 
-  _onDaySelected(selectedDay, focusedDay) {
+  void _onDaySelected(selectedDay, focusedDay) {
     if (!isSameDay(_selectedDay, selectedDay)) {
       setState(() {
         _selectedDay = selectedDay;
