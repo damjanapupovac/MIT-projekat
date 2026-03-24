@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kpop_profiles/models/enums.dart';
-import 'package:kpop_profiles/models/idol_model.dart';
 import 'package:kpop_profiles/providers/auth_providers.dart';
 import 'package:provider/provider.dart';
-import 'package:kpop_profiles/models/group_model.dart';
 import 'package:kpop_profiles/screens/calendar.dart';
 import 'package:kpop_profiles/screens/favourites.dart';
 import 'package:kpop_profiles/screens/home_screen.dart';

@@ -1,22 +1,46 @@
-import 'package:image_picker/image_picker.dart';
-import 'package:kpop_profiles/models/comment_model.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class IdolModel {
-  String id;
+  final String id;
   String name;
   String birthday;
-  XFile? pickedImage;
-  String? imageUrl;  
+  String? imageUrl;
+  String groupId;
   bool isFavorite;
-  List<CommentModel> comments;
 
   IdolModel({
     required this.id,
-    this.name = '',
-    this.birthday = '',
-    this.pickedImage,
+    required this.name,
+    required this.birthday,
     this.imageUrl,
+    required this.groupId,
     this.isFavorite = false,
-    this.comments = const [],
   });
+
+  factory IdolModel.fromMap(Map<String, dynamic> map, String docId) {
+    return IdolModel(
+      id: docId.isNotEmpty ? docId : (map['id'] ?? ''),
+      name: map['name'] ?? '',
+      birthday: map['birthday'] ?? '',
+      imageUrl: map['imageUrl'],
+      groupId: map['groupId'] ?? '',
+      isFavorite: map['isFavorite'] ?? false,
+    );
+  }
+
+  factory IdolModel.fromFirestore(DocumentSnapshot doc) {
+    final map = doc.data() as Map<String, dynamic>;
+    return IdolModel.fromMap(map, doc.id);
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'name': name,
+      'birthday': birthday,
+      'imageUrl': imageUrl,
+      'groupId': groupId,
+      'isFavorite': isFavorite,
+    };
+  }
 }

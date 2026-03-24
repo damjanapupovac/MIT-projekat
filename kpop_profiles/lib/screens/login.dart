@@ -20,6 +20,7 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   bool obscureText = true;
+  bool isLoading = false;
 
   late final TextEditingController _emailController;
   late final TextEditingController _passwordController;
@@ -48,22 +49,30 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _loginFct() async {
     if (!_formKey.currentState!.validate()) return;
+
+    setState(() {
+      isLoading = true;
+    });
+
     final auth = Provider.of<AuthProvider>(context, listen: false);
-    final email = _emailController.text.trim();
-    final password = _passwordController.text.trim();
-    if (email == 'user@gmail.com' && password == 'user123') {
-      auth.loginUser(isAdmin: false, username: '@user');
-      Navigator.of(context).pushReplacementNamed(RootScreen.routeName);
-    } else if (email == 'admin@gmail.com' && password == 'admin123') {
-      auth.loginUser(isAdmin: true, username: '@admin');
-      Navigator.of(context).pushReplacementNamed(RootScreen.routeName);
-    } else {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Wrong credentials')));
-      return;
+    final error = await auth.login(
+      email: _emailController.text.trim(),
+      password: _passwordController.text.trim(),
+    );
+
+    if (mounted) {
+      setState(() {
+        isLoading = false;
+      });
+
+      if (error == null) {
+        Navigator.of(context).pushReplacementNamed(RootScreen.routeName);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(error), backgroundColor: Colors.red),
+        );
+      }
     }
-    Navigator.of(context).pushReplacementNamed(RootScreen.routeName);
   }
 
   @override
@@ -80,7 +89,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   alignment: Alignment.centerLeft,
                   child: BackButton(
                     onPressed: () {
-                      Navigator.of(context).pushNamed(RootScreen.routeName);
+                      Navigator.of(
+                        context,
+                      ).pushReplacementNamed(RootScreen.routeName);
                     },
                   ),
                 ),
@@ -169,13 +180,21 @@ class _LoginScreenState extends State<LoginScreen> {
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton.icon(
-                          icon: const Icon(Icons.login),
-                          label: const Text("Login"),
-                          onPressed: _loginFct,
+                          icon: isLoading
+                              ? const SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : const Icon(Icons.login),
+                          label: Text(isLoading ? "Please wait..." : "Login"),
+                          onPressed: isLoading ? null : _loginFct,
                         ),
                       ),
                       const SizedBox(height: 24),
-                      const SizedBox(height: 16),
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
@@ -194,7 +213,9 @@ class _LoginScreenState extends State<LoginScreen> {
                           const SubtitleText(label: "New here?"),
                           TextButton(
                             onPressed: () {
-                              Navigator.of(context).pushNamed(RegisterScreen.routeName);
+                              Navigator.of(
+                                context,
+                              ).pushNamed(RegisterScreen.routeName);
                             },
                             child: const SubtitleText(
                               label: "Sign up",

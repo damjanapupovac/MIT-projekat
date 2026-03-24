@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:kpop_profiles/providers/idol_provider.dart';
+import 'package:kpop_profiles/providers/group_provider.dart';
 import 'package:kpop_profiles/screens/add_group.dart';
 import 'package:kpop_profiles/screens/group_details.dart';
 import '../models/group_model.dart';
@@ -15,60 +15,172 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen> {
+  late TextEditingController searchTextController;
+
+  @override
+  void initState() {
+    searchTextController = TextEditingController();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    searchTextController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final idolProvider = Provider.of<IdolProvider>(context);
+    final groupProvider = Provider.of<GroupProvider>(context);
+    final List<GroupModel> allGroups = groupProvider.groups;
 
-    final List<GroupModel> allGroups = [
-      GroupModel(
-        id: '1',
-        name: 'TWICE',
-        imageUrl: '',
-        idols: [
-          idolProvider.idols.firstWhere((i) => i.id == '101'),
-        ],
-        comments: [],
-      ),
-    ];
-
-    return Scaffold(
-      appBar: AppBar(title: const Text("Search Groups")),
-      body: ListView.builder(
-        itemCount: allGroups.length,
-        itemBuilder: (context, index) {
-          final group = allGroups[index];
-          return GestureDetector(
-            onTap: () => Navigator.push(context, MaterialPageRoute(
-              builder: (context) => GroupDetailsScreen(group: group, role: widget.role),
-            )),
-            child: Container(
-              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              height: 140,
-              decoration: BoxDecoration(
-                border: Border.all(width: 2.5, color: Theme.of(context).primaryColor),
-                borderRadius: BorderRadius.circular(25),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(15.0),
-                child: Row(
-                  children: [
-                    const CircleAvatar(radius: 45, child: Icon(Icons.groups, size: 40)),
-                    const SizedBox(width: 20),
-                    Text(group.name, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-                    const Spacer(),
-                    if (widget.role == UserRole.admin)
-                      IconButton(
-                        icon: const Icon(Icons.edit, size: 30, color: Colors.blue),
-                        onPressed: () => Navigator.push(context, MaterialPageRoute(
-                          builder: (context) => AddGroupScreen(existingGroup: group),
-                        )),
-                      ),
-                  ],
+    List<GroupModel> displayList = searchTextController.text.isEmpty
+        ? allGroups
+        : allGroups
+              .where(
+                (group) => group.name.toLowerCase().contains(
+                  searchTextController.text.toLowerCase(),
                 ),
+              )
+              .toList();
+
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: Scaffold(
+        appBar: AppBar(title: const Text("Search Groups")),
+        body: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: TextField(
+                controller: searchTextController,
+                decoration: InputDecoration(
+                  hintText: "Search group name...",
+                  prefixIcon: const Icon(Icons.search),
+                  suffixIcon: IconButton(
+                    icon: const Icon(Icons.clear),
+                    onPressed: () {
+                      setState(() {
+                        searchTextController.clear();
+                        FocusScope.of(context).unfocus();
+                      });
+                    },
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                ),
+                onChanged: (value) => setState(() {}),
               ),
             ),
-          );
-        },
+            Expanded(
+              child: displayList.isEmpty
+                  ? const Center(child: Text("No groups found."))
+                  : ListView.builder(
+                      itemCount: displayList.length,
+                      itemBuilder: (context, index) {
+                        final group = displayList[index];
+                        return Container(
+                          margin: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 10,
+                          ),
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              width: 2.5,
+                              color: Theme.of(context).primaryColor,
+                            ),
+                            borderRadius: BorderRadius.circular(25),
+                          ),
+                          child: ListTile(
+                            onTap: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => GroupDetailsScreen(
+                                  group: group,
+                                  role: widget.role,
+                                ),
+                              ),
+                            ),
+                            leading: CircleAvatar(
+                              radius: 30,
+                              backgroundImage: group.imageUrl.isNotEmpty
+                                  ? NetworkImage(group.imageUrl)
+                                  : null,
+                              child: group.imageUrl.isEmpty
+                                  ? const Icon(Icons.groups)
+                                  : null,
+                            ),
+                            title: Text(
+                              group.name,
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            trailing: widget.role == UserRole.admin
+                                ? Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      IconButton(
+                                        icon: const Icon(
+                                          Icons.edit,
+                                          color: Colors.blue,
+                                        ),
+                                        onPressed: () => Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                AddGroupScreen(
+                                                  existingGroup: group,
+                                                ),
+                                          ),
+                                        ),
+                                      ),
+                                      IconButton(
+                                        icon: const Icon(
+                                          Icons.delete,
+                                          color: Colors.red,
+                                        ),
+                                        onPressed: () async {
+                                          bool? confirm = await showDialog(
+                                            context: context,
+                                            builder: (ctx) => AlertDialog(
+                                              title: const Text("Delete?"),
+                                              content: Text(
+                                                "Remove ${group.name}?",
+                                              ),
+                                              actions: [
+                                                TextButton(
+                                                  onPressed: () =>
+                                                      Navigator.pop(ctx, false),
+                                                  child: const Text("Cancel"),
+                                                ),
+                                                TextButton(
+                                                  onPressed: () =>
+                                                      Navigator.pop(ctx, true),
+                                                  child: const Text("Delete"),
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                          if (confirm == true) {
+                                            await groupProvider.deleteGroup(
+                                              group.id,
+                                            );
+                                          }
+                                        },
+                                      ),
+                                    ],
+                                  )
+                                : null,
+                          ),
+                        );
+                      },
+                    ),
+            ),
+          ],
+        ),
       ),
     );
   }

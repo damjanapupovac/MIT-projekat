@@ -1,0 +1,66 @@
+query ListUserCourses($userId: UUID!) @auth(level: USER, insecureReason: "This operation is safe to expose to all logged in users. We are explicitly querying by a user ID, which should be validated on the client side to match auth.uid for sensitive data.") {
+  courses(where: { userId: { eq: $userId } }) {
+    id
+    name
+    courseCode
+    semester
+    year
+    instructorName
+  }
+}
+
+mutation CreateStudySession($userId: UUID!, $courseId: UUID, $topic: String!, $startTime: Timestamp!, $endTime: Timestamp!, $notes: String) @auth(level: USER) {
+  studySession_insert(
+    data: {
+      userId_expr: "auth.uid", # Ensures the session is created by the authenticated user
+      courseId: $courseId,
+      topic: $topic,
+      startTime: $startTime,
+      endTime: $endTime,
+      notes: $notes
+    }
+  ) {
+    id
+  }
+}
+
+query GetCourseDetails($courseId: UUID!) @auth(level: USER, insecureReason: "This operation is safe to expose to all logged in users. We assume the client will only request courses they have access to, or this course is public by design.") {
+  course(id: $courseId) {
+    id
+    name
+    courseCode
+    description
+    semester
+    year
+    instructorName
+    user {
+      id
+      displayName
+      email
+    }
+    assignments_on_course {
+      id
+      title
+      dueDate
+      status
+    }
+    studySessions_on_course {
+      id
+      topic
+      startTime
+      endTime
+      user {
+        displayName
+      }
+    }
+  }
+}
+
+mutation UpdateAssignmentStatus($assignmentId: UUID!, $newStatus: String!) @auth(expr: "exists(request.resource.course.userId) && request.resource.course.userId == auth.uid || exists(request.resource.course.courseCollaborations_on_course.role) && request.resource.course.courseCollaborations_on_course.role.includes('instructor') && exists(request.resource.course.courseCollaborations_on_course.userId) && request.resource.course.courseCollaborations_on_course.userId.includes(auth.uid)") {
+  assignment_update(
+    key: { id: $assignmentId },
+    data: { status: $newStatus }
+  ) {
+    id
+  }
+}

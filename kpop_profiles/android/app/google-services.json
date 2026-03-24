@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "590889112063",
+    "project_id": "mitprojekat-a05cc",
+    "storage_bucket": "mitprojekat-a05cc.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:590889112063:android:cc991d7d19c0c3342157ca",
+        "android_client_info": {
+          "package_name": "com.example.kpop_profiles"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDv8CmjQlKAMtYLYqH5UOHjxVoMDBxvSJI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

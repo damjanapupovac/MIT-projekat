@@ -1,18 +1,22 @@
-import 'package:kpop_profiles/models/comment_model.dart';
-import 'package:kpop_profiles/models/idol_model.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class GroupModel {
-  String id;
-  String name;
-  String imageUrl;
-  List<IdolModel> idols;
-  List<CommentModel> comments;
+  final String id;
+  final String name;
+  final String imageUrl;
 
-  GroupModel({
-    required this.id,
-    required this.name,
-    required this.imageUrl,
-    required this.idols,
-    this.comments = const [],
-  });
+  GroupModel({required this.id, required this.name, required this.imageUrl});
+
+  factory GroupModel.fromFirestore(DocumentSnapshot doc) {
+    final data = doc.data() as Map<String, dynamic>?;
+    return GroupModel(
+      id: doc.id,
+      name: data?['name'] ?? '',
+      imageUrl: data?['imageUrl'] ?? '',
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {'id': id, 'name': name, 'imageUrl': imageUrl};
+  }
 }

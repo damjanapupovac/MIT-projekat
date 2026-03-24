@@ -1,75 +1,83 @@
 import 'package:flutter/material.dart';
-import 'package:kpop_profiles/providers/auth_providers.dart';
+import 'package:provider/provider.dart';
 import 'package:kpop_profiles/providers/idol_provider.dart';
 import 'package:kpop_profiles/screens/idol_profile.dart';
-import 'package:provider/provider.dart';
 import '../models/enums.dart';
 
-class Favourites extends StatefulWidget {
-  static const routeName = '/Favourites';
+class Favourites extends StatelessWidget {
+  static const routeName = "/FavouritesScreen";
   const Favourites({super.key});
 
   @override
-  State<Favourites> createState() => _FavouritesState();
-}
-
-class _FavouritesState extends State<Favourites> {
-  @override
   Widget build(BuildContext context) {
-    final authProvider = Provider.of<AuthProvider>(context);
     final idolProvider = Provider.of<IdolProvider>(context);
-
-    if (!authProvider.isLoggedIn) {
-      return Scaffold(
-        appBar: AppBar(title: const Text('Favourites')),
-        body: const Center(
-          child: Text(
-            'You need to login to see your favourites',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-        ),
-      );
-    }
-
-    final favoriteIdols = idolProvider.favoriteIdols;
-    final currentRole = authProvider.isAdmin ? UserRole.admin : UserRole.user;
+    final favouriteIdols = idolProvider.favouriteIdols;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('My Favourites')),
-      body: favoriteIdols.isEmpty
-          ? const Center(child: Text("No favorites yet!"))
-          : ListView.builder(
-              itemCount: favoriteIdols.length,
-              itemBuilder: (context, index) {
-                final idol = favoriteIdols[index];
-                return Card(
-                  margin: const EdgeInsets.symmetric(
-                    horizontal: 15,
-                    vertical: 8,
+      appBar: AppBar(
+        title: const Text("My Favourite Idols"),
+        centerTitle: true,
+      ),
+      body: favouriteIdols.isEmpty
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.favorite_border, size: 80, color: Colors.grey[400]),
+                  const SizedBox(height: 10),
+                  const Text(
+                    "No favourite idols yet!",
+                    style: TextStyle(fontSize: 18, color: Colors.grey),
                   ),
+                ],
+              ),
+            )
+          : ListView.builder(
+              padding: const EdgeInsets.all(10),
+              itemCount: favouriteIdols.length,
+              itemBuilder: (ctx, i) {
+                final idol = favouriteIdols[i];
+                return Card(
+                  elevation: 3,
+                  margin: const EdgeInsets.symmetric(vertical: 8),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(15),
-                    side: BorderSide(color: Theme.of(context).primaryColor),
                   ),
                   child: ListTile(
-                    onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (c) =>
-                            IdolProfileScreen(idol: idol, role: currentRole),
-                      ),
-                    ),
-                    leading: const CircleAvatar(
-                      child: Icon(Icons.star, color: Colors.orange),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => IdolProfileScreen(
+                            idol: idol,
+                            role: UserRole.user,
+                          ),
+                        ),
+                      );
+                    },
+                    contentPadding: const EdgeInsets.all(10),
+                    leading: CircleAvatar(
+                      radius: 30,
+                      backgroundImage: idol.imageUrl != null && idol.imageUrl!.isNotEmpty
+                          ? NetworkImage(idol.imageUrl!)
+                          : null,
+                      child: idol.imageUrl == null || idol.imageUrl!.isEmpty
+                          ? const Icon(Icons.person)
+                          : null,
                     ),
                     title: Text(
                       idol.name,
-                      style: const TextStyle(fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
                     ),
-                    subtitle: Text(idol.birthday),
+                    subtitle: Text("Birthday: ${idol.birthday}"),
                     trailing: IconButton(
-                      icon: const Icon(Icons.favorite, color: Colors.red),
-                      onPressed: () => idolProvider.toggleFavorite(idol.id),
+                      icon: const Icon(Icons.favorite, color: Colors.red, size: 28),
+                      onPressed: () {
+                        idolProvider.toggleFavourite(idol.id);
+                      },
                     ),
                   ),
                 );

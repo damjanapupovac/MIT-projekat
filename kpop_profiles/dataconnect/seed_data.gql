@@ -1,0 +1,80 @@
+mutation SeedData @transaction @auth(level: USER, insecureReason: "Seed data operations are for authenticated users only and do not expose sensitive data.") {
+  user_insertMany(data: [
+    {
+      id: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+      createdAt: "2023-01-01T10:00:00Z",
+      displayName: "Alice Smith",
+      email: "alice.smith@example.com",
+      university: "University A"
+    },
+    {
+      id: "b1fcc111-1c1c-4b4b-9c9c-9cc9dd330b22",
+      createdAt: "2023-01-02T11:00:00Z",
+      displayName: "Bob Johnson",
+      email: "bob.johnson@example.com",
+      university: "University B"
+    }
+  ])
+  course_insertMany(data: [
+    {
+      id: "c2gdd222-2d2d-4c4c-0d0d-0dd0ee440c33",
+      userId: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+      courseCode: "CS101",
+      createdAt: "2023-01-05T12:00:00Z",
+      description: "Introduction to Computer Science",
+      instructorName: "Professor X",
+      name: "Intro to CS",
+      semester: "Fall",
+      year: 2023
+    },
+    {
+      id: "d3hee333-3e3e-4d4d-1e1e-1ee1ff550d44",
+      userId: "b1fcc111-1c1c-4b4b-9c9c-9cc9dd330b22",
+      courseCode: "MA201",
+      createdAt: "2023-01-06T13:00:00Z",
+      description: "Calculus I",
+      instructorName: "Dr. Y",
+      name: "Calculus I",
+      semester: "Fall",
+      year: 2023
+    }
+  ])
+  assignment_insertMany(data: [
+    {
+      id: "e4iff444-4f4f-4e4e-2f2f-2ff2gg660e55",
+      courseId: "c2gdd222-2d2d-4c4c-0d0d-0dd0ee440c33",
+      createdAt: "2023-02-01T09:00:00Z",
+      dueDate: "2023-02-15T17:00:00Z",
+      status: "Assigned",
+      title: "Homework 1"
+    },
+    {
+      id: "f5jgg555-5g5g-4f4f-3g3g-3gg3hh770f66",
+      courseId: "d3hee333-3e3e-4d4d-1e1e-1ee1ff550d44",
+      createdAt: "2023-02-05T10:00:00Z",
+      dueDate: "2023-02-20T17:00:00Z",
+      status: "Assigned",
+      title: "Problem Set 1"
+    }
+  ])
+  courseCollaboration_insertMany(data: [
+    {
+      courseId: "c2gdd222-2d2d-4c4c-0d0d-0dd0ee440c33",
+      userId: "b1fcc111-1c1c-4b4b-9c9c-9cc9dd330b22",
+      createdAt: "2023-01-10T14:00:00Z",
+      role: "TA"
+    }
+  ])
+  studySession_insertMany(data: [
+    {
+      id: "g6khh666-6h6h-4g4g-4h4h-4hh4ii880g77",
+      courseId: "c2gdd222-2d2d-4c4c-0d0d-0dd0ee440c33",
+      userId: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+      createdAt: "2023-03-01T15:00:00Z",
+      startTime: "2023-03-05T18:00:00Z",
+      endTime: "2023-03-05T19:00:00Z",
+      topic: "Midterm Review",
+      notes: "Covered Chapters 1-3"
+    }
+  ])
+}
